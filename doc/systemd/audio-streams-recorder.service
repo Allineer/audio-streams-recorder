@@ -1,0 +1,17 @@
+[Unit]
+Description=audio-streams-recorder
+Wants=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/bin/bash /usr/local/bin/audio-streams-recorder daemon
+Restart=on-failure
+RestartSec=1m
+
+# Disable Python's buffering of STDOUT and STDERR, so that output from the
+# service shows up immediately in systemd's logs
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

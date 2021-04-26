@@ -1,0 +1,24 @@
+storage: storage/{station}
+
+stations:
+  - title:
+    url:
+    # Optional. Default value is 60m.
+    duration: 60m
+
+logs:
+  formats:
+    lib.worker: "{asctime} | {levelname:>8} | {station:>50} | {message}"
+
+  handlers:
+    default:
+      type: console
+    lib.worker:
+      type: console
+      format: lib.worker
+
+  loggers:
+    root:
+      handlers: [default]
+    lib.worker:
+      handlers: [lib.worker]

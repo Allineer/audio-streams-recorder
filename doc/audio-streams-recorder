@@ -1,0 +1,4 @@
+#!/bin/bash
+
+SOURCE="/usr/local/src/audio-streams-recorder"
+${SOURCE}/.env/bin/python -Bu ${SOURCE}/audio-streams-recorder.py "$@"

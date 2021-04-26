@@ -1,0 +1,10 @@
+--extra-index-url https://knyshov.info/pypi
+helpers-cli
+helpers-config
+helpers-logging
+helpers-utils
+
+aiohttp
+
+# optional but highly recommended:
+# uvloop

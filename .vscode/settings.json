@@ -1,0 +1,19 @@
+{
+    "editor.formatOnSave": true,
+    "files.trimFinalNewlines": true,
+    "python.formatting.blackArgs": [
+        "--line-length=99"
+    ],
+    "python.formatting.provider": "black",
+    "python.linting.enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length=99",
+        "--extend-ignore=E203"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.pythonPath": ".env/bin/python",
+    "python.venvFolders": [
+        ".env"
+    ],
+}

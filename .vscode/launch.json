@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "default",
+            "type": "python",
+            "pythonArgs": [
+                "-Bu"
+            ],
+            "request": "launch",
+            "program": "audio-streams-recorder.py",
+            "args": [
+                "daemon"
+            ],
+            "console": "internalConsole",
+        }
+    ]
+}
