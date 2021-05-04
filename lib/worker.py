@@ -42,6 +42,15 @@ class Worker(AIOClassFactory):
             headers={"Icy-MetaData": "1"},
         )
 
+    async def _parse_metadata_title(self, metadata: bytes) -> Optional[str]:
+        for k, v in [x.split("=") for x in metadata.decode().split(";") if "=" in x]:
+            if k == "StreamTitle":
+                title = v.strip("'").strip()
+                if title != "-":
+                    return title
+            break
+        return None
+
     async def _worker_task(self) -> None:
         if not os.path.exists(self._storage):
             os.makedirs(self._storage, mode=0o755, exist_ok=True)
@@ -108,26 +117,21 @@ class Worker(AIOClassFactory):
                         )
                         if metadata_blocks > 0:
                             # Read meta information (each block == 16 bytes)
-                            metadata = (
-                                await response.content.readexactly(metadata_blocks * 16)
-                            ).decode()
-                            for k, v in [x.split("=") for x in metadata.split(";") if "=" in x]:
-                                if k == "StreamTitle":
-                                    time_passed = unix_timestamp() - started_at
-                                    title = v.strip("'").strip()
-                                    if title == "-":
-                                        continue  # jingles
-                                    self._logger.debug(
-                                        "- {:02}:{:02}:{:02}:{:02} {}".format(
-                                            *interval_representation(time_passed),
-                                            title
-                                        )
+                            metadata = await response.content.readexactly(metadata_blocks * 16)
+                            title = await self._parse_metadata_title(metadata)
+                            if title:
+                                time_passed = unix_timestamp() - started_at
+
+                                self._logger.debug(
+                                    "- {:02}:{:02}:{:02}:{:02} {}".format(
+                                        *interval_representation(time_passed),
+                                        title
                                     )
-                                    counter += 1
-                                    cue_fd.write("  TRACK {:02} AUDIO\n".format(counter))
-                                    cue_fd.write("    TITLE \"{}\"\n".format(title))
-                                    cue_fd.write("    INDEX 01 {:02}:{:02}:00\n".format(*divmod(time_passed, 60))) # noqa E501
-                                    continue
+                                )
+                                counter += 1
+                                cue_fd.write("  TRACK {:02} AUDIO\n".format(counter))
+                                cue_fd.write("    TITLE \"{}\"\n".format(title))
+                                cue_fd.write("    INDEX 01 {:02}:{:02}:00\n".format(*divmod(time_passed, 60))) # noqa E501
             else:
                 with open(self._storage + "/" + filename + "." + fileext, mode="wb", buffering=self.BUFFER_SIZE) as media_fd: # noqa E501
                     self._logger.info("New file started: {}.{} (without CUE)".format(filename, fileext)) # noqa E501
